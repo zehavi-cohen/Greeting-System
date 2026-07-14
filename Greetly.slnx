@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Greetly.Api/Greetly.Api.csproj" />
+  <Project Path="Greetly.Application/Greetly.Application.csproj" />
+  <Project Path="Greetly.Domain/Greetly.Domain.csproj" />
+  <Project Path="Greetly.Infrastructure/Greetly.Infrastructure.csproj" />
+</Solution>
