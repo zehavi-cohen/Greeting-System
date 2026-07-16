@@ -7,6 +7,7 @@ public class User
     public string Email { get; set; } = null!;
     public string PasswordHash { get; set; } = null!;
     public string DisplayName { get; set; } = null!;
+    public string Role { get; set; } = "User";
     public DateTime CreatedAt { get; set; }
 
     public ICollection<Greeting> Greetings { get; set; } = new List<Greeting>();

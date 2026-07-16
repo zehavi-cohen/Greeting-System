@@ -1,6 +1,168 @@
-@Greetly.Api_HostAddress = http://localhost:5067
 
-GET {{Greetly.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+@baseUrl = http://localhost:5000
+@token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmMTQ1Nzc0YS02ZTJjLTQxYjctOGZlNi1lOTcxYjA2OTMzZDYiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWVpZGVudGlmaWVyIjoiZjE0NTc3NGEtNmUyYy00MWI3LThmZTYtZTk3MWIwNjkzM2Q2IiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvbmFtZSI6ImFkbWluIiwiaHR0cDovL3NjaGVtYXMueG1sc29hcC5vcmcvd3MvMjAwNS8wNS9pZGVudGl0eS9jbGFpbXMvZW1haWxhZGRyZXNzIjoiYWRtaW5AZ3JlZXRseS5jb20iLCJleHAiOjE3ODQ3ODY3NjQsImlzcyI6IkdyZWV0bHkiLCJhdWQiOiJHcmVldGx5Q2xpZW50cyJ9.QUHeJ2pz1M4ByIFncG2G-eXTAsTkFELf2oUkla-TzlQ",
 
-###
+
+### =========================================
+### AUTH
+### =========================================
+
+### הרשמה
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "zehaviC",
+  "email": "zehavi@gmail.com",
+  "password": "P@ssw0rd123",
+  "displayName": "זהבי"
+}
+
+### התחברות — התוצאה (Token) מכניסים ידנית ל-@token למעלה
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+{
+  "email": "admin@greetly.com",
+  "password": "Admin123!"
+}
+
+
+### =========================================
+### OCCASIONS
+### =========================================
+
+### שליפת כל האירועים הפעילים (ציבורי, מה-cache)
+GET {{baseUrl}}/api/occasions
+
+### [Admin] יצירת אירוע חדש
+POST {{baseUrl}}/api/admin/occasions
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "יום הולדת",
+  "sortOrder": 1
+}
+
+### [Admin] עדכון אירוע קיים
+PUT {{baseUrl}}/api/admin/occasions/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "יום הולדת מעודכן",
+  "sortOrder": 1,
+  "isActive": true
+}
+
+### [Admin] מחיקה/השבתה של אירוע
+DELETE {{baseUrl}}/api/admin/occasions/1
+Authorization: Bearer {{token}}
+
+
+### =========================================
+### STYLES
+### =========================================
+
+### שליפת כל הסגנונות הפעילים (ציבורי)
+GET {{baseUrl}}/api/styles
+
+### [Admin] יצירת סגנון חדש
+POST {{baseUrl}}/api/admin/styles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "הומוריסטי",
+  "agentPromptHint": "טון קליל, הומור עדין, אימוג'ים מדי פעם"
+}
+
+### [Admin] עדכון סגנון קיים
+PUT {{baseUrl}}/api/admin/styles/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "הומוריסטי מעודכן",
+  "agentPromptHint": "טון קליל יותר",
+  "isActive": true
+}
+
+
+### =========================================
+### GREETINGS
+### =========================================
+
+### גלריה ציבורית (ללא צורך באימות) — עם פילטרים אופציונליים
+GET {{baseUrl}}/api/gallery?occasionId=1&styleId=1&searchTerm=&page=1&pageSize=12
+
+### שליפת ברכה בודדת לפי Id (דורש אימות כדי לדעת אם המשתמש עשה Favorite)
+GET {{baseUrl}}/api/greetings/a9057477-7400-4150-9242-a1fea6106a46
+Authorization: Bearer {{token}}
+
+### הברכות שלי
+GET {{baseUrl}}/api/greetings/mine
+Authorization: Bearer {{token}}
+
+### עדכון ברכה קיימת
+PUT {{baseUrl}}/api/greetings/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "recipientName": "דנה",
+  "title": "מזל טוב!",
+  "contentText": "טקסט ברכה מעודכן",
+  "visibility": 2
+}
+
+### מחיקת ברכה
+DELETE {{baseUrl}}/api/greetings/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### =========================================
+### FAVORITES
+### =========================================
+
+### סימון ברכה כמועדפת
+POST {{baseUrl}}/api/greetings/00000000-0000-0000-0000-000000000000/favorite
+Authorization: Bearer {{token}}
+
+### הסרת סימון מועדף
+DELETE {{baseUrl}}/api/greetings/00000000-0000-0000-0000-000000000000/favorite
+Authorization: Bearer {{token}}
+
+
+### =========================================
+### DRAFTS (אייגנטים)
+### =========================================
+
+### יצירת טיוטה ראשונית ע"י אייגנט התוכן
+POST {{baseUrl}}/api/drafts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "rawUserText": "חברה טובה שעוברת דירה, רוצה משהו חם ומצחיק",
+  "occasionId": 1,
+  "styleId": 1,
+  "recipientName": "דנה"
+}
+
+### עדכון/שיפור טיוטה קיימת (id הוא int - מזהה ה-Draft)
+POST {{baseUrl}}/api/drafts/1/revise
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userInstruction": "תעשה את זה יותר מצחיק ופחות רשמי"
+}
+
+### סופי — הפיכת הטיוטה ל-Greeting אמיתי (כולל יצירת SVG ע"י אייגנט העיצוב)
+POST {{baseUrl}}/api/drafts/1/finalize
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "visibility": 2
+}
